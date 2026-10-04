@@ -14,12 +14,12 @@
     {id:'all', number:9, name:'Все темы', x:290, y:660}
   ];
   const SEASONS = {
-    all:{name:'Весь цикл', code:'00 / TIME CIRCUIT', months:[1,2,3,4,5,6,7,8,9,10,11,12]},
-    winter:{name:'Зима', code:'01 / WINTER', months:[1,2]},
-    spring:{name:'Весна', code:'02 / SPRING', months:[3,4,5]},
-    summer:{name:'Лето', code:'03 / SUMMER', months:[6,7,8]},
-    autumn:{name:'Осень', code:'04 / AUTUMN', months:[9,10,11]},
-    prologue:{name:'Пролог · ноябрь — декабрь 2025', code:'05 / PRELUDE', months:[11,12]}
+    all:{name:'Весь год', months:[1,2,3,4,5,6,7,8,9,10,11,12]},
+    winter:{name:'Зима', months:[1,2]},
+    spring:{name:'Весна', months:[3,4,5]},
+    summer:{name:'Лето', months:[6,7,8]},
+    autumn:{name:'Осень', months:[9,10,11]},
+    prologue:{name:'Ноябрь — декабрь 2025', months:[11,12]}
   };
   const KIND = {challenge:'Трудность', strength:'Сильная сторона', mixed:'Смешанная тема'};
   function eventYear(event, month) {
@@ -63,15 +63,15 @@
   }
   function saveCurrentNote() {
     const text=$('note-input').value.trim(); if(text) notes[noteKey()]=text; else delete notes[noteKey()];
-    noteStatus(writeNotes() ? 'Запись сохранена в этом браузере.' : 'Запись хранится только до закрытия страницы. Скачай копию заметок.');
-    $('notes-open').textContent=notes[noteKey()] ? 'Моя запись ●' : 'Моя запись +';
+    noteStatus(writeNotes() ? 'Сохранено в браузере.' : 'Запись хранится только до закрытия страницы. Скачай копию заметок.');
+    $('notes-open').textContent=notes[noteKey()] ? 'Заметки ●' : 'Заметки';
   }
   function openSource(event) {
     const source=archive.sources.find(s=>s.id===event.source.id);
     $('source-title').textContent=event.title;
     $('source-meta').textContent=`${source.file} · абзац${event.source.paragraphs.length>1?'ы':''} ${event.source.paragraphs.join(', ')} · ${event.timingLabel}`;
     $('source-quote').textContent=event.source.quote;
-    $('source-caution').textContent=event.caution || 'Фрагмент транскрипта сохранён без исправления ошибок распознавания. Тезис передаёт интерпретацию автора записи.';
+    $('source-caution').textContent=event.caution || '';
     $('source-dialog').showModal();
   }
   function drawMap() {
@@ -80,10 +80,9 @@
       const g=svgEl('g',{class:'map-node-group',transform:`translate(${theme.x} ${theme.y})`,role:'button',tabindex:0,'data-theme':theme.id,'aria-label':theme.name});
       g.append(svgEl('circle',{class:'node-hit-area',r:46}),svgEl('circle',{class:'node-orbit',r:38}), svgEl('circle',{class:'map-node',r:28}));
       const number=svgEl('text',{class:'node-number','text-anchor':'middle',y:8});number.textContent=theme.number;g.append(number);
-      const anchor=theme.id==='friends'?'end':theme.x>400?'end':'start';
+      const anchor=theme.id==='study'?'start':theme.id==='friends'?'end':theme.x>400?'end':'start';
       const labelX=anchor==='end'?-43:43;
-      const label=svgEl('text',{class:'node-label','text-anchor':anchor,x:labelX,y:-3});label.textContent=theme.name;g.append(label);
-      const counter=svgEl('text',{class:'node-counter','text-anchor':anchor,x:labelX,y:15});g.append(counter);
+      const label=svgEl('text',{class:'node-label','text-anchor':anchor,x:labelX,y:theme.id==='self'?62:-3});label.textContent=({study:'Учёба',body:'Тело',family:'Дом',friends:'Друзья'})[theme.id] || theme.name;g.append(label);
       const activate=()=>{state.theme=theme.id==='all'?'':(state.theme===theme.id?'':theme.id);$('theme-filter').value=state.theme;render();};
       g.addEventListener('click',activate);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}});
       group.append(g);
@@ -94,11 +93,8 @@
   function render() {
     const filtered=filterEvents(events,state);
     const counts=filterEvents(events,state,true);
-    const summary=state.view==='general' ? archive.summaries.general : archive.summaries[state.season];
-    $('active-period').textContent=state.view==='general'?'06 / YEAR BACKGROUND':SEASONS[state.season].code;
-    $('period-title').textContent=state.year===2027?'Следующий цикл':state.view==='general'?'Общий фон года':state.month?`${MONTHS[state.month-1]} ${state.season==='prologue'?2025:2026}`:SEASONS[state.season].name;
-    $('period-summary').textContent=state.year===2027?'Новая запись ожидается примерно 3 ноября 2026. До её добавления прогнозы этого цикла здесь не отображаются.':summary;
-    $('results-count').textContent=state.year===2027?'ЗАПИСЬ НЕ ДОБАВЛЕНА':`${String(filtered.length).padStart(2,'0')} / ФРАГМЕНТОВ`;
+    $('period-title').textContent=state.year===2027?'2027':state.view==='general'?'Общие темы':state.month?`${MONTHS[state.month-1]} ${state.season==='prologue'?2025:2026}`:SEASONS[state.season].name;
+    $('results-count').textContent=state.year===2027?'':String(filtered.length);
     $('next-year-panel').hidden=state.year!==2027;
     $('empty-state').hidden=filtered.length>0 || state.year===2027;
     $('events-list').replaceChildren();
@@ -113,35 +109,34 @@
       article.append(meta,el('h3','event-title',event.title),el('p','event-summary',event.summary));
       if(event.timingNote)article.append(el('p','event-caution',event.timingNote));
       const foot=el('div','event-foot');foot.append(el('span','event-theme',THEMES.find(t=>t.id===event.theme)?.name || event.theme));
-      const button=el('button','source-button',`[ источник ${event.source.id.slice(1).padStart(2,'0')} ↗ ]`);button.type='button';button.addEventListener('click',()=>openSource(event));foot.append(button);article.append(foot);$('events-list').append(article);
+      const button=el('button','source-button','Источник');button.type='button';button.addEventListener('click',()=>openSource(event));foot.append(button);article.append(foot);$('events-list').append(article);
     }
     document.querySelectorAll('[data-season]').forEach(b=>{const selected=b.dataset.season===state.season;b.classList.toggle('is-selected',selected);b.setAttribute('aria-pressed',String(selected));b.disabled=state.view==='general'||state.year===2027;});
     document.querySelectorAll('[data-view]').forEach(b=>{const selected=b.dataset.view===state.view;b.classList.toggle('is-selected',selected);b.setAttribute('aria-pressed',String(selected));});
     $('month-filter').disabled=state.view==='general'||state.year===2027;
-    $('month-filter').replaceChildren(new Option('Все месяцы периода',''));
+    $('month-filter').replaceChildren(new Option('Все месяцы',''));
     for(const month of SEASONS[state.season].months)$('month-filter').append(new Option(MONTHS[month-1],String(month)));
     $('month-filter').value=state.month?String(state.month):'';
     document.querySelectorAll('.map-node-group').forEach(g=>{
       const theme=g.dataset.theme, count=theme==='all'?counts.length:counts.filter(e=>e.theme===theme).length;
       const active=theme==='all'?!state.theme:state.theme===theme;
       g.classList.toggle('is-active',active);g.classList.toggle('is-empty',count===0);g.setAttribute('aria-pressed',String(active));
-      g.setAttribute('aria-label',`${THEMES.find(t=>t.id===theme).name}, ${count} фрагментов`);g.querySelector('.node-counter').textContent=count?`${String(count).padStart(2,'0')} фрагм.`:'нет фрагментов';
+      g.setAttribute('aria-label',`${THEMES.find(t=>t.id===theme).name}, ${count} фрагментов`);
     });
     document.querySelectorAll('.map-edge').forEach(e=>e.classList.toggle('is-active',Boolean(state.theme)&&(e.dataset.a===state.theme||e.dataset.b===state.theme)));
-    $('map-caption').textContent=state.theme?`Зона ${THEMES.find(t=>t.id===state.theme).number} / ${THEMES.find(t=>t.id===state.theme).name}`:'Выбери зону, чтобы прочитать её темы';
     $('month-timeline').replaceChildren();
     const months=state.season==='prologue'?[11,12]:Array.from({length:12},(_,i)=>i+1);
     for(const month of months){
       const button=el('button','timeline-month');button.type='button';
       const year=state.season==='prologue'?2025:2026;
       const count=events.filter(e=>e.precision!=='general'&&e.months.includes(month)&&eventYear(e,month)===year).length;
-      button.append(el('span','month-number',String(month).padStart(2,'0')),el('span','month-name',MONTHS[month-1]),el('span','month-count',count?`${count} фр.`:'нет записи'));
+      button.append(el('span','month-name',MONTHS[month-1]));
       button.disabled=state.year===2027||state.view==='general'||!count;
       button.title=count?`${MONTHS[month-1]} ${year}: ${count} фрагментов`:'Нет прогноза в текущей записи';
       button.classList.toggle('is-active',state.month===month);button.setAttribute('aria-pressed',String(state.month===month));
       button.addEventListener('click',()=>{state.month=state.month===month?0:month;if(state.season!=='prologue'&&!SEASONS[state.season].months.includes(month))state.season='all';render();});$('month-timeline').append(button);
     }
-    $('notes-open').textContent=notes[noteKey()]?'Моя запись ●':'Моя запись +';
+    $('notes-open').textContent=notes[noteKey()]?'Заметки ●':'Заметки';
     const params=new URLSearchParams();for(const [key,value] of Object.entries(state))if(value!==''&&value!==0)params.set(key,String(value));
     try {history.replaceState(null,'',`#${params}`);} catch {}
   }
@@ -155,8 +150,8 @@
     if(Object.hasOwn(KIND,p.get('kind')))state.kind=p.get('kind');
     state.search=(p.get('search')||'').slice(0,300);
     $('year-select').value=String(state.year);$('search-input').value=state.search;$('kind-filter').value=state.kind;
-    $('theme-filter').replaceChildren(new Option('Все жизненные темы',''));
-    THEMES.filter(t=>t.id!=='all').forEach(t=>$('theme-filter').append(new Option(`${t.number} / ${t.name}`,t.id)));$('theme-filter').value=state.theme;
+    $('theme-filter').replaceChildren(new Option('Все темы',''));
+    THEMES.filter(t=>t.id!=='all').forEach(t=>$('theme-filter').append(new Option(t.name,t.id)));$('theme-filter').value=state.theme;
     $('year-select').addEventListener('change',e=>{state.year=Number(e.target.value);render();});
     document.querySelectorAll('[data-season]').forEach(b=>b.addEventListener('click',()=>{state.season=b.dataset.season;state.month=0;render();}));
     document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{state.view=b.dataset.view;state.month=0;render();}));
@@ -166,13 +161,12 @@
     $('source-close').addEventListener('click',()=>$('source-dialog').close());
     $('note-close').addEventListener('click',()=>$('notes-dialog').close());
     for(const id of ['source-dialog','notes-dialog'])$(id).addEventListener('click',e=>{if(e.target===$(id)){const r=$(id).getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$(id).close();}});
-    $('notes-open').addEventListener('click',()=>{$('notes-title').textContent=`Мои наблюдения · ${$('period-title').textContent}`;$('note-input').value=notes[noteKey()]||'';noteStatus(storageAvailable?'Заметки остаются в этом браузере. Для переноса скачай копию.':'Хранилище браузера недоступно. Скачай копию заметок перед закрытием.');$('notes-dialog').showModal();$('note-input').focus();});
+    $('notes-open').addEventListener('click',()=>{$('notes-title').textContent=`Заметки · ${$('period-title').textContent}`;$('note-input').value=notes[noteKey()]||'';noteStatus(storageAvailable?'':'Хранилище браузера недоступно. Скачай копию заметок перед закрытием.');$('notes-dialog').showModal();$('note-input').focus();});
     $('note-save').addEventListener('click',saveCurrentNote);
     $('note-clear').addEventListener('click',()=>{$('note-input').value='';saveCurrentNote();});
-    $('export-notes').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({format:'astro-archive-notes',version:1,notes},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download='astro-archive-notes.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);noteStatus('Копия заметок подготовлена для скачивания.');});
+    $('export-notes').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({format:'astro-archive-notes',version:1,notes},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download='astro-archive-notes.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);noteStatus('Скачано.');});
     $('import-notes-button').addEventListener('click',()=>$('import-notes').click());
-    $('import-notes').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>4000000)throw new Error('size');const data=JSON.parse(await file.text());if(!validateNotes(data))throw new Error('format');notes={...notes,...data.notes};const saved=writeNotes();$('note-input').value=notes[noteKey()]||'';noteStatus(saved?'Заметки из копии добавлены. Совпадающие периоды обновлены.':'Заметки добавлены до закрытия страницы. Скачай новую копию.');render();}catch{noteStatus('Не удалось прочитать копию. Нужен JSON, скачанный из этого приложения.');}e.target.value='';});
-    const list=el('ul','sources-list');for(const source of archive.sources)list.append(el('li','',`${source.id.slice(1).padStart(2,'0')} / ${source.file} — ${source.description}`));$('archive-sources').append(list);
+    $('import-notes').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>4000000)throw new Error('size');const data=JSON.parse(await file.text());if(!validateNotes(data))throw new Error('format');notes={...notes,...data.notes};const saved=writeNotes();$('note-input').value=notes[noteKey()]||'';noteStatus(saved?'Загружено.':'Заметки добавлены до закрытия страницы. Скачай новую копию.');render();}catch{noteStatus('Не удалось прочитать копию. Нужен JSON, скачанный из этого приложения.');}e.target.value='';});
     drawMap();render();
   }
   init();

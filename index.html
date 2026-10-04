@@ -3,63 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111110">
-  <meta name="description" content="Личный архив астрологических интерпретаций: сезонные темы, сильные стороны и возможные трудности с точными ссылками на исходные транскрипты.">
-  <title>Карта личного времени — Astro Archive</title>
+  <meta name="theme-color" content="#e5e5e5">
+  <title>astro-calendar</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <script src="./data/archive.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
-  <a class="skip-link" href="#events-list">Перейти к интерпретациям</a>
-  <div class="archive-shell">
-    <header class="masthead">
-      <a class="wordmark" href="./" aria-label="Astro Archive — главная">
-        <svg class="archive-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15"/><circle cx="20" cy="20" r="5"/><path d="M20 0v40M0 20h40M6 6l28 28M6 34L34 6"/><circle cx="20" cy="5" r="2"/><circle cx="35" cy="20" r="2"/><circle cx="20" cy="35" r="2"/><circle cx="5" cy="20" r="2"/></svg>
-        <span>ASTRO <span class="wordmark-divider">/</span> ARCHIVE</span>
-      </a>
-      <span class="masthead-description">ЛИЧНЫЙ АРХИВ · Р. БУРАНГУЛОВ</span>
-      <div class="year-control"><label for="year-select">ЗАПИСЬ</label><select id="year-select" aria-label="Выбрать год"><option value="2026">2026</option><option value="2027">2027</option></select></div>
+  <a class="skip-link" href="#events-list">К записям</a>
+  <main class="archive-shell">
+    <header class="archive-header">
+      <h1>astro-calendar</h1>
+      <div class="header-controls">
+        <label for="year-select" class="sr-only">Год</label>
+        <select id="year-select"><option value="2026">2026</option><option value="2027">2027</option></select>
+        <button id="notes-open" class="notes-button" type="button">Заметки</button>
+      </div>
     </header>
-
-    <main>
-      <section class="introduction" aria-labelledby="archive-title">
-        <div class="title-block">
-          <p class="eyebrow"><span class="small-cross" aria-hidden="true">✳</span> ATLAS OF PERSONAL TIME / VOL. I</p>
-          <h1 id="archive-title">Карта личного <em>времени</em><span class="title-period">.</span></h1>
-        </div>
-        <div class="intro-note"><p>У каждого периода — свой рисунок.<br>Темы, напряжения и возможности<br>из&nbsp;записей натальной карты.</p><span class="archive-status"><span class="status-dot" aria-hidden="true"></span> АРХИВ ОТКРЫТ ДЛЯ НАБЛЮДЕНИЙ</span></div>
-      </section>
-
-      <nav id="season-tabs" class="season-navigation" aria-label="Период года">
-        <span class="navigation-label">ПЕРИОД</span>
-        <div class="season-buttons">
-          <button type="button" data-season="all" class="is-selected" aria-pressed="true">Весь цикл <span>00</span></button>
-          <button type="button" data-season="winter" aria-pressed="false">Зима <span>01</span></button>
-          <button type="button" data-season="spring" aria-pressed="false">Весна <span>02</span></button>
-          <button type="button" data-season="summer" aria-pressed="false">Лето <span>03</span></button>
-          <button type="button" data-season="autumn" aria-pressed="false">Осень <span>04</span></button>
-          <button type="button" data-season="prologue" aria-pressed="false">Пролог <span>−1</span></button>
-        </div>
-      </nav>
-
-      <section id="next-year-panel" class="next-year-panel" hidden aria-labelledby="next-year-title">
-        <p class="eyebrow">ЗАПИСЬ 2027 / ОЖИДАНИЕ</p>
-        <h2 id="next-year-title">Следующая глава ещё не записана.</h2>
-        <p>Новая карта ожидается примерно 3 ноября 2026 года. Этот раздел будет заполнен после получения транскрипта.</p>
-      </section>
-
-      <div class="atlas-layout">
-        <section class="sky-panel" aria-labelledby="sky-heading">
-          <div class="panel-heading"><h2 id="sky-heading"><span>01</span> КАРТОГРАФИЯ ТЕМ</h2><span class="panel-register">ДЕСЯТЬ ЗОН / ОДИН ГОД</span></div>
-          <div class="sky-canvas">
-            <span class="map-coordinate coordinate-top-left">ФИГУРА I.</span>
-            <span class="map-coordinate coordinate-top-right">9 → 0</span>
-            <span class="map-coordinate coordinate-left">СВЯЗИ · ТЕМЫ · НАБЛЮДЕНИЯ</span>
-            <svg id="sky-map" viewBox="0 0 720 780" role="group" aria-labelledby="map-title map-description">
+    <nav class="season-nav" aria-label="Период">
+      <button type="button" data-season="all" aria-pressed="false">Весь год</button>
+      <button type="button" data-season="winter" aria-pressed="false">Зима</button>
+      <button type="button" data-season="spring" aria-pressed="false">Весна</button>
+      <button type="button" data-season="summer" aria-pressed="false">Лето</button>
+      <button type="button" data-season="autumn" aria-pressed="true" class="is-selected">Осень</button>
+      <button type="button" data-season="prologue" aria-pressed="false">Ноябрь — декабрь 2025</button>
+      <div class="view-switch" role="group" aria-label="Записи">
+        <button type="button" data-view="periods" class="is-selected" aria-pressed="true">Сезоны</button>
+        <button type="button" data-view="general" aria-pressed="false">Общие темы</button>
+      </div>
+    </nav>
+    <div class="archive-grid">
+      <aside class="map-panel" aria-label="Карта тем">
+        <svg id="sky-map" viewBox="0 0 720 780" role="group" aria-labelledby="map-title map-description">
               <title id="map-title">Карта жизненных тем</title>
-              <desc id="map-description">Авторская карта из десяти связанных зон, вдохновлённая нумограммой CCRU. Выберите зону, чтобы увидеть соответствующие интерпретации.</desc>
+              <desc id="map-description">Жизненные темы</desc>
               <defs>
                 <pattern id="star-dust" width="181" height="167" patternUnits="userSpaceOnUse"><circle cx="27" cy="33" r=".7" fill="#e5ded0" opacity=".4"/><circle cx="126" cy="61" r=".5" fill="#e5ded0" opacity=".28"/><circle cx="83" cy="148" r=".7" fill="#e5ded0" opacity=".32"/><circle cx="164" cy="117" r=".45" fill="#e5ded0" opacity=".23"/></pattern>
                 <marker id="diagram-arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto-start-reverse"><path d="M0,0 6,3 0,6" fill="none" stroke="currentColor" stroke-width=".8"/></marker>
@@ -78,50 +56,40 @@
                 <g class="map-star"><path d="M571 142v10M566 147h10"/><circle cx="571" cy="147" r="1.2"/></g>
                 <g class="map-star"><path d="M610 581v14M603 588h14"/><circle cx="610" cy="588" r="1.6"/></g>
                 <g class="map-star"><path d="M130 607v9M125.5 611.5h9"/></g>
-                <text class="diagram-annotation" x="89" y="91">I. ORIENTATION</text>
-                <text class="diagram-annotation" x="545" y="497" transform="rotate(90 545 497)">II. TIME CIRCUIT</text>
-                <text class="diagram-annotation" x="85" y="729">III. RETURN / RECURSION</text>
-                <text class="diagram-equation" x="535" y="697">1 + 2 + 3 + 4 = 10</text>
-                <text class="diagram-equation" x="573" y="712">1 + 0 = 1</text>
               </g>
               <g id="map-edges" aria-hidden="true"></g>
               <g id="map-nodes"></g>
             </svg>
-            <p id="map-caption" class="map-caption">Выберите зону на карте, чтобы прочитать связанные с ней записи.</p>
-          </div>
-          <div class="map-legend" aria-label="Условные обозначения"><span><i class="legend-symbol legend-challenge" aria-hidden="true"></i>Напряжение</span><span><i class="legend-symbol legend-strength" aria-hidden="true"></i>Возможность</span><span><i class="legend-symbol legend-mixed" aria-hidden="true"></i>Двойственная тема</span></div>
-        </section>
-
-        <section class="dossier-panel" aria-labelledby="period-title">
-          <div class="panel-heading"><h2><span>02</span> СЕЗОННОЕ ДОСЬЕ</h2><button id="notes-open" class="plain-button" type="button">МОИ НАБЛЮДЕНИЯ <span aria-hidden="true">↗</span></button></div>
-          <div class="dossier-introduction"><p id="active-period" class="eyebrow">ЗАПИСЬ 2026 / ВЕСЬ ГОД</p><h2 id="period-title">Рисунок года</h2><p id="period-summary">Сильные стороны и возможные трудности каждого периода — с опорой на исходные записи.</p></div>
-          <div id="view-tabs" class="view-tabs" role="group" aria-label="Тип интерпретаций"><button type="button" data-view="periods" class="is-selected" aria-pressed="true">По времени</button><button type="button" data-view="general" aria-pressed="false">Общие темы карты</button></div>
-          <div class="dossier-filters">
-            <label class="filter-label">МЕСЯЦ<select id="month-filter"><option value="">Все месяцы</option></select></label>
-            <label class="filter-label">ЗОНА<select id="theme-filter"><option value="">Все темы</option></select></label>
-            <label class="filter-label">ХАРАКТЕР<select id="kind-filter"><option value="">Все записи</option><option value="challenge">Трудности</option><option value="strength">Сильные стороны</option><option value="mixed">Двойственные</option></select></label>
-            <label class="search-field"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="m12 12 5 5"/></svg><span class="sr-only">Поиск по записям</span><input id="search-input" type="search" placeholder="Найти в архиве…" autocomplete="off"></label>
-          </div>
-          <div class="results-heading"><span id="results-count" aria-live="polite">ЗАГРУЗКА ЗАПИСЕЙ…</span><button id="reset-filters" class="plain-button" type="button">СБРОСИТЬ <span aria-hidden="true">×</span></button></div>
-          <div id="events-list" class="events-list" tabindex="-1"></div>
-          <div id="empty-state" class="empty-state" hidden><span class="empty-symbol" aria-hidden="true">∅</span><h3>Здесь пока тихо.</h3><p>Для выбранного периода и фильтров записей нет. Попробуйте выбрать другую тему или сбросить фильтры.</p></div>
-          
-        </section>
-      </div>
-
-      <section class="chronology" aria-labelledby="chronology-title"><div class="chronology-heading"><h2 id="chronology-title"><span>03</span> ЛИНИЯ ВРЕМЕНИ</h2><p>ВЫБЕРИТЕ МЕСЯЦ, ЧТОБЫ ПРИБЛИЗИТЬ ПЕРИОД</p></div><div id="month-timeline" class="month-timeline" role="group" aria-label="Месяцы года"></div></section>
-
-      <section class="archive-colophon" aria-labelledby="about-title">
-        <div class="colophon-title"><p class="eyebrow">ОБ ЭТОЙ КАРТЕ</p><h2 id="about-title">Сначала запись.<br>Потом — наблюдение.</h2></div>
-        <div class="colophon-text"><p>Этот атлас сохраняет интерпретации из ваших астрологических транскриптов. Каждая запись отделяет период, тему, возможную трудность и сильную сторону; исходный фрагмент можно открыть рядом с тезисом.</p><p>Карта вдохновлена нумограммой CCRU: десять зон и связывающие их течения. Это художественная схема тем, а не рассчитанное положение звёзд. Интерпретации не устанавливают будущие события — здесь их можно сопоставлять с собственными наблюдениями.</p><details id="archive-sources" class="archive-sources"><summary>ИСХОДНЫЕ ЗАПИСИ <span aria-hidden="true">+</span></summary><div class="sources-content"><p>Шесть транскриптов прогноза на 2026. Начальный ноябрь восстановлен как 2025 по последовательности записи; цикл заканчивается перед днём рождения 3 ноября 2026.</p></div></details></div>
+      </aside>
+      <section class="dossier-panel" aria-labelledby="period-title">
+        <div class="dossier-header"><h2 id="period-title">Осень</h2><span id="results-count" aria-live="polite"></span></div>
+        <div class="filters">
+          <label><span class="sr-only">Месяц</span><select id="month-filter"><option value="">Все месяцы</option></select></label>
+          <label><span class="sr-only">Тема</span><select id="theme-filter"><option value="">Все темы</option></select></label>
+          <label><span class="sr-only">Характер</span><select id="kind-filter"><option value="">Все записи</option><option value="challenge">Трудности</option><option value="strength">Сильные стороны</option><option value="mixed">Смешанные</option></select></label>
+          <label class="search-field"><span class="sr-only">Поиск</span><input id="search-input" type="search" placeholder="Поиск" autocomplete="off"></label>
+          <button id="reset-filters" class="reset-button" type="button">Сбросить</button>
+        </div>
+        <p id="next-year-panel" class="next-year-panel" hidden>2027: запись ожидается 3 ноября.</p>
+        <div id="events-list" class="events-list" tabindex="-1"></div>
+        <p id="empty-state" class="empty-state" hidden>Нет записей.</p>
       </section>
-    </main>
-
-    <footer class="archive-footer"><span>ASTRO / ARCHIVE</span><span>ЛИЧНЫЙ АТЛАС · 2026—2027</span><span>CONTINUED ON THE NEXT PAGE <span aria-hidden="true">↗</span></span></footer>
-  </div>
-
-  <dialog id="source-dialog" class="archive-dialog" aria-labelledby="source-title"><div class="dialog-heading"><p class="eyebrow">ПЕРВОИСТОЧНИК / ФРАГМЕНТ</p><button type="button" id="source-close" class="dialog-close" aria-label="Закрыть источник">×</button></div><h2 id="source-title"></h2><p id="source-meta" class="source-meta"></p><blockquote id="source-quote"></blockquote><p id="source-caution" class="source-caution"></p></dialog>
-  <dialog id="notes-dialog" class="archive-dialog notes-dialog" aria-labelledby="notes-title"><div class="dialog-heading"><p class="eyebrow">ПОЛЕВЫЕ ЗАМЕТКИ</p><button type="button" id="note-close" class="dialog-close" aria-label="Закрыть заметки">×</button></div><h2 id="notes-title">Что произошло на самом деле?</h2><p class="notes-description">Запишите наблюдения о выбранном периоде. Заметки сохраняются в этом браузере; копию можно скачать и перенести.</p><label for="note-input" class="sr-only">Текст наблюдений</label><textarea id="note-input" rows="8" maxlength="12000" placeholder="Дата, событие, собственное ощущение…"></textarea><div class="note-actions"><button id="note-save" class="action-button" type="button">Сохранить запись <span aria-hidden="true">↗</span></button><button id="note-clear" class="plain-button" type="button">ОЧИСТИТЬ</button></div><p id="note-status" class="note-status" aria-live="polite"></p><div class="note-transfer"><button id="export-notes" class="plain-button" type="button">СКАЧАТЬ ЗАМЕТКИ ↓</button><button id="import-notes-button" class="plain-button" type="button">ЗАГРУЗИТЬ КОПИЮ ↑</button><input id="import-notes" type="file" accept="application/json,.json" hidden></div></dialog>
-  <noscript><p class="noscript-notice">Для выбора периодов и просмотра записей включите JavaScript. Тезисы и цитаты также доступны в файле data/archive.json.</p></noscript>
+    </div>
+    <nav class="chronology" aria-label="Месяцы"><div id="month-timeline" class="month-timeline" role="group" aria-label="Месяцы"></div></nav>
+  </main>
+  <dialog id="source-dialog" class="archive-dialog" aria-labelledby="source-title">
+    <button type="button" id="source-close" class="dialog-close" aria-label="Закрыть">×</button>
+    <h2 id="source-title"></h2><p id="source-meta" class="source-meta"></p>
+    <blockquote id="source-quote"></blockquote><p id="source-caution" class="dialog-caution"></p>
+  </dialog>
+  <dialog id="notes-dialog" class="archive-dialog" aria-labelledby="notes-title">
+    <button type="button" id="note-close" class="dialog-close" aria-label="Закрыть">×</button>
+    <h2 id="notes-title">Заметки</h2>
+    <label for="note-input" class="sr-only">Заметка</label><textarea id="note-input" class="note-input" rows="8" maxlength="12000"></textarea>
+    <div class="dialog-actions"><button id="note-save" type="button">Сохранить</button><button id="note-clear" type="button">Очистить</button></div>
+    <p id="note-status" class="dialog-note" aria-live="polite"></p>
+    <div class="dialog-actions"><button id="export-notes" type="button">Скачать</button><button id="import-notes-button" type="button">Загрузить</button><input id="import-notes" type="file" accept="application/json,.json" hidden></div>
+  </dialog>
+  <noscript>Включите JavaScript.</noscript>
 </body>
 </html>
