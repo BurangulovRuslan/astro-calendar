@@ -1,101 +1,16 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#020805">
-  <title>◌</title>
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css">
-  <script src="./data/archive.js" defer></script>
-  <script src="./numogram.js" defer></script>
-  <script src="./app.js" defer></script>
-  <script src="./data/sky-catalog.js" defer></script>
-  <script src="./sky.js" defer></script>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta name="theme-color" content="#020805">
+ <title>◌</title>
+ <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+ <link rel="stylesheet" href="./styles.css">
+ <script src="./app.js" defer></script>
 </head>
 <body>
-  <canvas id="celestial-sky" aria-hidden="true"></canvas>
-  <a class="skip-link" href="#events-list">К записям</a>
-  <main class="archive-shell">
-    <header class="archive-header">
-      <div class="header-controls">
-        <label for="year-select" class="sr-only">Год</label>
-        <select id="year-select"><option value="2026">2026</option><option value="2027">2027</option></select>
-        <button id="notes-open" class="notes-button icon-button" type="button" aria-label="Заметки" title="Заметки"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h3"/></svg></button>
-      </div>
-    </header>
-    <nav class="season-nav" aria-label="Период">
-      <button type="button" data-season="all" aria-pressed="false">Весь год</button>
-      <button type="button" data-season="winter" aria-pressed="false">Зима</button>
-      <button type="button" data-season="spring" aria-pressed="false">Весна</button>
-      <button type="button" data-season="summer" aria-pressed="false">Лето</button>
-      <button type="button" data-season="autumn" aria-pressed="true" class="is-selected">Осень</button>
-      <button type="button" data-season="prologue" aria-pressed="false">Ноябрь — декабрь 2025</button>
-      <div class="view-switch" role="group" aria-label="Записи">
-        <button type="button" data-view="periods" class="is-selected" aria-pressed="true">Сезоны</button>
-        <button type="button" data-view="general" aria-pressed="false">Общие темы</button>
-      </div>
-    </nav>
-    <div class="archive-grid">
-      <aside class="map-panel" aria-label="Карта тем">
-        <svg id="sky-map" viewBox="0 0 720 780" role="group" aria-labelledby="map-title map-description">
-              <title id="map-title">Карта жизненных тем</title>
-              <desc id="map-description">Жизненные темы</desc>
-              <defs>
-                <radialGradient id="node-sphere" cx="28%" cy="24%" r="78%">
-                  <stop offset="0" stop-color="#bbffe1"/><stop offset=".18" stop-color="#4cbd83"/>
-                  <stop offset=".48" stop-color="#155338"/><stop offset=".82" stop-color="#071c12"/><stop offset="1" stop-color="#020604"/>
-                </radialGradient>
-                <radialGradient id="node-sphere-active" cx="28%" cy="24%" r="80%">
-                  <stop offset="0" stop-color="#eefff6"/><stop offset=".18" stop-color="#b2ffce"/>
-                  <stop offset=".5" stop-color="#36c979"/><stop offset=".84" stop-color="#126136"/><stop offset="1" stop-color="#031a0c"/>
-                </radialGradient>
-                <marker id="diagram-arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto-start-reverse"><path d="M0,0 6,3 0,6" fill="none" stroke="currentColor" stroke-width=".8"/></marker>
-              </defs>
-              <g aria-hidden="true" class="sky-background">
-                
-                
-                <ellipse cx="350" cy="400" rx="261" ry="338" class="orbit orbit-outer" transform="rotate(12 350 400)"/>
-                <ellipse cx="350" cy="400" rx="224" ry="315" class="orbit" transform="rotate(-23 350 400)"/>
-                <ellipse cx="350" cy="400" rx="251" ry="143" class="orbit orbit-dashed" transform="rotate(-58 350 400)"/>
-                <path class="axis" d="M350 28v720M54 400h612"/>
-                <path class="axis-tick" d="M344 28h12M344 752h12M54 394v12M666 394v12"/>
-                <path class="decorative-current" d="M270 130C283 50 426 78 390 165M490 270C472 189 332 257 240 300M535 365C570 443 502 563 350 500M180 410C123 496 200 578 350 500M350 500C258 548 265 657 290 660M405 605C454 639 460 672 420 700"/>
-                <path class="decorative-current secondary-current" d="M390 165C342 214 213 201 240 300M240 300C240 359 339 451 350 500M535 365C466 389 497 508 405 605M290 660C252 694 316 730 420 700"/>
-              </g>
-              <g id="map-edges" aria-hidden="true"></g>
-              <g id="map-nodes"></g>
-            </svg>
-      </aside>
-      <section class="dossier-panel" aria-labelledby="period-title">
-        <div class="dossier-header sr-only"><h2 id="period-title">Осень</h2><span id="results-count" aria-live="polite"></span></div>
-        <div class="filters">
-          <label><span class="sr-only">Месяц</span><select id="month-filter"><option value="">Все месяцы</option></select></label>
-          <label><span class="sr-only">Тема</span><select id="theme-filter"><option value="">Все темы</option></select></label>
-          <label><span class="sr-only">Характер</span><select id="kind-filter"><option value="">Все записи</option><option value="challenge">Трудности</option><option value="strength">Сильные стороны</option><option value="mixed">Смешанные</option></select></label>
-          <label class="search-field"><span class="sr-only">Поиск</span><input id="search-input" type="search" placeholder="Поиск" autocomplete="off"></label>
-          <button id="reset-filters" class="reset-button icon-button" type="button" aria-label="Сбросить фильтры" title="Сбросить"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
-        </div>
-        <p id="next-year-panel" class="next-year-panel" hidden>2027: запись ожидается 3 ноября.</p>
-        <div id="events-list" class="events-list" tabindex="-1"></div>
-        <p id="empty-state" class="empty-state" hidden>Нет записей.</p>
-      </section>
-    </div>
-    <nav class="chronology" aria-label="Месяцы"><div id="month-timeline" class="month-timeline" role="group" aria-label="Месяцы"></div></nav>
-  </main>
-  <dialog id="source-dialog" class="archive-dialog" aria-labelledby="source-title">
-    <button type="button" id="source-close" class="dialog-close" aria-label="Закрыть">×</button>
-    <h2 id="source-title" class="sr-only"></h2><p id="source-meta" class="source-meta"></p>
-    <blockquote id="source-quote"></blockquote><p id="source-caution" class="dialog-caution"></p>
-  </dialog>
-  <dialog id="notes-dialog" class="archive-dialog" aria-labelledby="notes-title">
-    <button type="button" id="note-close" class="dialog-close" aria-label="Закрыть">×</button>
-    <h2 id="notes-title" class="sr-only">Заметки</h2>
-    <label for="note-input" class="sr-only">Заметка</label><textarea id="note-input" class="note-input" rows="8" maxlength="12000"></textarea>
-    <div class="dialog-actions"><button id="note-save" type="button">Сохранить</button><button id="note-clear" type="button">Очистить</button></div>
-    <p id="note-status" class="dialog-note" aria-live="polite"></p>
-    <div class="dialog-actions"><button id="export-notes" type="button">Скачать</button><button id="import-notes-button" type="button">Загрузить</button><input id="import-notes" type="file" accept="application/json,.json" hidden></div>
-  </dialog>
-  <noscript>Включите JavaScript.</noscript>
+ <div id="root"><!--APP--></div>
+ <noscript>Включите JavaScript для вращения и выбора периода.</noscript>
 </body>
 </html>

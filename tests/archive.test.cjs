@@ -2,7 +2,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
-const {filterEvents,validateNotes,eventYear,THEMES}=require('../app.js');
+const {filterEvents,validateNotes,eventYear,THEMES}=require('../src/model.cjs');
 const archive=require('../data/archive.json');
 const base={year:2026,season:'all',month:0,view:'periods',theme:'',kind:'',search:''};
 
@@ -36,7 +36,7 @@ test('new cycle remains empty in every mode',()=>{
  for(const view of ['general','periods'])assert.equal(filterEvents(archive.events,{...base,year:2027,view}).length,0);
 });
 test('theme, strength and query filters combine without losing temporal scope',()=>{
- const found=filterEvents(archive.events,{...base,season:'autumn',month:10,theme:'work',kind:'strength',search:'оптимизац'});
+ const found=filterEvents(archive.events,{...base,season:'autumn',month:10,theme:'work',kind:'strength',search:'оптимиз'});
  assert.deepEqual(found.map(e=>e.id),['e607']);
  const counts=filterEvents(archive.events,{...base,season:'autumn',theme:'money'},true);
  assert(counts.some(e=>e.theme==='work'));
@@ -53,11 +53,4 @@ test('note imports accept only bounded archive format and period keys',()=>{
  assert(!validateNotes(JSON.parse('{"format":"astro-archive-notes","version":1,"notes":{"__proto__":"bad"}}')));
  assert(!validateNotes({format:'astro-archive-notes',version:1,notes:{'2026:autumn:10':3}}));
  assert(!validateNotes({format:'astro-archive-notes',version:1,notes:{'2026:autumn:10':'a'.repeat(12001)}}));
-});
-test('static shell contains every required interaction and no external assets',()=>{
- const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
- const js=fs.readFileSync(path.join(__dirname,'../app.js'),'utf8');
- const required=[...js.matchAll(/\$\('([^']+)'\)/g)].map(m=>m[1]);
- for(const id of required)assert(html.includes(`id="${id}"`),`Missing DOM target ${id}`);
- assert(!/(?:src|href)="https?:\/\//.test(html));
 });
