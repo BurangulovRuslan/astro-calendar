@@ -89,6 +89,7 @@
     }
     const pairs=[[6,3],[3,2],[2,7],[7,1],[1,5],[5,4],[4,1],[1,8],[8,9],[9,0],[0,9],[5,7],[8,7]];
     for(const [a,b] of pairs){const A=THEMES[a],B=THEMES[b];const mx=(A.x+B.x)/2+(a>b?45:-45);$('map-edges').append(svgEl('path',{d:`M ${A.x} ${A.y} Q ${mx} ${(A.y+B.y)/2} ${B.x} ${B.y}`,class:'map-edge','data-a':A.id,'data-b':B.id}));}
+    if(window.Numogram3D)window.Numogram3D.create({svg:$('sky-map'),nodes:THEMES,links:pairs});
   }
   function render() {
     const filtered=filterEvents(events,state);

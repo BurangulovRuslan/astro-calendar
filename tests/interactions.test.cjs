@@ -21,16 +21,27 @@ class Element {
 }
 function flatten(items){return items.flatMap(e=>[e,...flatten(e.children||[])]);}
 function matches(e,selector){if(selector.startsWith('.'))return e.className.split(' ').includes(selector.slice(1));const attr=selector.match(/^\[data-(.+)\]$/);return attr?e.dataset[attr[1]]!==undefined:false;}
-function setup(){
+function setup({threeDimensions=false}={}){
  const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');const nodes={};
  for(const [,id] of html.matchAll(/id="([^"]+)"/g))nodes[id]=new Element();
  const buttons=[];for(const [,key,value] of html.matchAll(/data-(season|view)="([^"]+)"/g)){const b=new Element('button');b.dataset[key]=value;buttons.push(b);}
  const document={getElementById:id=>nodes[id],createElement:tag=>new Element(tag),createElementNS:(ns,tag)=>new Element(tag),querySelectorAll:selector=>[...buttons,...flatten(Object.values(nodes))].filter(e=>matches(e,selector))};
  const stored={};
- const context={document,window:{ASTRO_ARCHIVE:archive},localStorage:{getItem:k=>stored[k]||null,setItem:(k,v)=>stored[k]=v},history:{replaceState(){}},location:{hash:''},URLSearchParams,Option:function(text,value){const e=new Element('option');e.textContent=text;e.value=value;return e;},setTimeout,URL,Blob};
+ const sceneCalls=[];
+ const window={ASTRO_ARCHIVE:archive};if(threeDimensions)window.Numogram3D={create:options=>sceneCalls.push(options)};
+ const context={document,window,localStorage:{getItem:k=>stored[k]||null,setItem:(k,v)=>stored[k]=v},history:{replaceState(){}},location:{hash:''},URLSearchParams,Option:function(text,value){const e=new Element('option');e.textContent=text;e.value=value;return e;},setTimeout,URL,Blob};
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../app.js'),'utf8'),context);
- return {nodes,buttons,stored,document};
+ return {nodes,buttons,stored,document,sceneCalls};
 }
+test('spatial renderer receives the full numogram and node activation still selects the forecast',async()=>{
+ const {nodes,sceneCalls}=setup({threeDimensions:true});
+ assert.equal(sceneCalls.length,1);assert.equal(sceneCalls[0].svg,nodes['sky-map']);
+ assert.equal(sceneCalls[0].nodes.length,10);assert.equal(sceneCalls[0].links.length,13);
+ const work=nodes['map-nodes'].children.find(e=>e.dataset.theme==='work');
+ await work.fire('keydown',{key:'Enter'});assert.equal(nodes['theme-filter'].value,'work');
+ assert(nodes['events-list'].children.length>0);
+ assert(nodes['events-list'].children.every(e=>e.children.find(c=>c.className==='event-foot').children[0].textContent==='Работа'));
+});
 test('live season, theme and year handlers render their matching dossier',async()=>{
  const {nodes,buttons}=setup();
  assert.equal(nodes['period-title'].textContent,'Осень');assert(nodes['events-list'].children.length>0);
